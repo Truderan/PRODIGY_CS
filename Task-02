@@ -1,0 +1,67 @@
+from PIL import Image
+import numpy as np
+import os
+
+def encrypt_image(input_path, output_path, key):
+    """Encrypts an image using XOR operation."""
+    try:
+        img = Image.open(input_path).convert('RGB')  # Convert to RGB mode
+        img_array = np.array(img)
+
+        # Apply XOR encryption with the key
+        encrypted_array = img_array ^ key
+
+        encrypted_img = Image.fromarray(encrypted_array.astype('uint8'))
+        encrypted_img.save(output_path)
+
+        print(f"✅ Image encrypted successfully: {output_path}")
+    except Exception as e:
+        print(f"❌ Error encrypting image: {e}")
+
+def decrypt_image(input_path, output_path, key):
+    """Decrypts an image by reversing the encryption process."""
+    try:
+        img = Image.open(input_path).convert('RGB')  # Convert to RGB mode
+        img_array = np.array(img)
+
+        # Reverse encryption (XOR again)
+        decrypted_array = img_array ^ key
+
+        decrypted_img = Image.fromarray(decrypted_array.astype('uint8'))
+        decrypted_img.save(output_path)
+
+        print(f"✅ Image decrypted successfully: {output_path}")
+    except Exception as e:
+        print(f"❌ Error decrypting image: {e}")
+
+def main():
+    """User menu for encryption and decryption."""
+    print("🔐 Image Encryption & Decryption Tool")
+    choice = input("Type 'E' to Encrypt or 'D' to Decrypt: ").strip().upper()
+
+    if choice not in ['E', 'D']:
+        print("❌ Invalid choice. Please enter 'E' or 'D'.")
+        return
+
+    input_path = input("Enter the input image filename (e.g., download.jpg): ").strip()
+    if not os.path.exists(input_path):
+        print("❌ File not found! Make sure the file exists.")
+        return
+
+    output_path = input("Enter the output filename (e.g., encrypted.png or decrypted.jpg): ").strip()
+    try:
+        key = int(input("Enter an encryption key (1-255): ").strip())
+        if not (1 <= key <= 255):
+            print("❌ Key must be between 1 and 255.")
+            return
+    except ValueError:
+        print("❌ Invalid key! Enter a number between 1-255.")
+        return
+
+    if choice == 'E':
+        encrypt_image(input_path, output_path, key)
+    else:
+        decrypt_image(input_path, output_path, key)
+
+if __name__ == "__main__":
+    main()
