@@ -1,0 +1,37 @@
+from scapy.all import sniff, IP, TCP, UDP, Raw
+
+def packet_callback(packet):
+    if packet.haslayer(IP):
+        src_ip = packet[IP].src
+        dst_ip = packet[IP].dst
+        protocol = packet[IP].proto
+        
+        print(f"[+] Packet Captured: {src_ip} -> {dst_ip} | Protocol: {protocol}")
+        
+        if packet.haslayer(TCP):
+            print("    [-] TCP Packet")
+        elif packet.haslayer(UDP):
+            print("    [-] UDP Packet")
+        
+        if packet.haslayer(Raw):
+            try:
+                payload = packet[Raw].load.decode('utf-8')
+            except UnicodeDecodeError:
+                payload = "[Binary or Non-UTF-8 Data]"
+            print("    [-] Payload:", payload)
+        
+        print("="*50)
+
+def start_sniffing(interface=None, count=10):
+    print("[*] Starting packet sniffer...")
+    sniff(iface=interface, prn=packet_callback, count=count, store=False)
+
+if __name__ == "__main__":
+    interface = input("Enter interface (leave blank for default): ") or None
+    try:
+        packet_count = int(input("Enter number of packets to capture: "))
+    except ValueError:
+        print("Invalid number. Using default count of 10.")
+        packet_count = 10
+    
+    start_sniffing(interface, packet_count)
